@@ -12,10 +12,15 @@ from dotenv import load_dotenv
 from datetime import timedelta
 from moviepy.video.fx.all import crop
 from moviepy.video.tools.subtitles import SubtitlesClip
+from PIL import Image
 
 load_dotenv("../.env")
 
 ASSEMBLY_AI_API_KEY = os.getenv("ASSEMBLY_AI_API_KEY")
+
+if not hasattr(Image, 'ANTIALIAS'):
+    # For Pillow 10.0.0+
+    Image.ANTIALIAS = Image.Resampling.LANCZOS
 
 
 def save_video(video_url: str, directory: str = "../temp") -> str:

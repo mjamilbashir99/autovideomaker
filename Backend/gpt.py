@@ -208,21 +208,27 @@ def get_search_terms(video_subject: str, amount: int, script: str, ai_model: str
             raise ValueError("Response is not a list of strings.")
 
     except (json.JSONDecodeError, ValueError):
-        # Get everything between the first and last square brackets
-        response = response[response.find("[") + 1:response.rfind("]")]
-
         print(colored("[*] GPT returned an unformatted response. Attempting to clean...", "yellow"))
-
-        # Attempt to extract list-like string and convert to list
-        match = re.search(r'\["(?:[^"\\]|\\.)*"(?:,\s*"[^"\\]*")*\]', response)
-        print(match.group())
-        if match:
-            try:
-                search_terms = json.loads(match.group())
-            except json.JSONDecodeError:
-                print(colored("[-] Could not parse response.", "red"))
-                return []
-
+        
+        # Get everything between the first and last square brackets
+        try:
+            response = response[response.find("["):response.rfind("]") + 1]
+            # Attempt to extract list-like string and convert to list
+            match = re.search(r'\["(?:[^"\\]|\\.)*"(?:,\s*"[^"\\]*")*\]', response)
+            
+            if match:
+                try:
+                    search_terms = json.loads(match.group())
+                except json.JSONDecodeError:
+                    print(colored("[-] Could not parse response.", "red"))
+                    search_terms = [video_subject]  # Fallback to using the video subject as a search term
+            else:
+                print(colored("[-] Could not find valid JSON array in response.", "red"))
+                search_terms = [video_subject]  # Fallback to using the video subject as a search term
+                
+        except Exception as e:
+            print(colored(f"[-] Error processing response: {str(e)}", "red"))
+            search_terms = [video_subject]  # Fallback to using the video subject as a search term
 
     # Let user know
     print(colored(f"\nGenerated {len(search_terms)} search terms: {', '.join(search_terms)}", "cyan"))
