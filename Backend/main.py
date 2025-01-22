@@ -42,6 +42,7 @@ change_settings({"IMAGEMAGICK_BINARY": os.getenv("IMAGEMAGICK_BINARY")})
 
 # Initialize Flask
 app = Flask(__name__)
+CORS(app)  # Enables CORS for all routes
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 # Constants
