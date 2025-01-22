@@ -10,7 +10,7 @@ from flask_cors import CORS
 from termcolor import colored
 from youtube import upload_video
 from apiclient.errors import HttpError
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 import time
 import threading
 
@@ -54,11 +54,45 @@ GENERATION_PROGRESS = {}
 
 
 def update_progress(generation_id: str, status: str, progress: int, message: str):
-    """Update progress for a specific generation"""
+    """Update the progress of a video generation"""
     GENERATION_PROGRESS[generation_id] = {
         "status": status,
         "progress": progress,
         "message": message
+    }
+
+    # Save script to file when it's generated
+    if status == "processing" and "script" in message.lower():
+        try:
+            script_dir = os.path.join("temp", generation_id)
+            os.makedirs(script_dir, exist_ok=True)
+            script_path = os.path.join(script_dir, "script.txt")
+            
+            # Extract script from the message or get it from your script generation
+            script_content = message  # Adjust this based on how you store the script
+            
+            with open(script_path, "w") as f:
+                f.write(script_content)
+        except Exception as e:
+            print(colored(f"[-] Error saving script: {str(e)}", "red"))
+
+
+def get_generation_progress(generation_id: str) -> dict:
+    """Get the progress of a video generation"""
+    if generation_id in GENERATION_PROGRESS:
+        progress_data = GENERATION_PROGRESS[generation_id].copy()
+        
+        # Add download URLs if generation is complete
+        if progress_data["status"] == "completed":
+            progress_data["videoUrl"] = f"/download/video/{generation_id}"
+            progress_data["scriptUrl"] = f"/download/script/{generation_id}"
+        
+        return progress_data
+    
+    return {
+        "status": "not_found",
+        "progress": 0,
+        "message": "Generation not found"
     }
 
 
@@ -140,12 +174,22 @@ def generate():
 
 
         update_progress(generation_id, "processing", 10, "Generating script...")
-        script = generate_script(data["videoSubject"], paragraph_number, ai_model, voice, data["customPrompt"])  # Pass the AI model to the script generation
+        script = generate_script(
+            data["videoSubject"], 
+            paragraph_number,
+            ai_model,
+            voice,
+            data.get('customPrompt')
+        )
+
+        if script.startswith("Error"):
+            raise Exception(script)
 
         update_progress(generation_id, "processing", 20, "Generating search terms...")
-        search_terms = get_search_terms(
-            data["videoSubject"], AMOUNT_OF_STOCK_VIDEOS, script, ai_model
-        )
+        search_terms = get_search_terms(data["videoSubject"], AMOUNT_OF_STOCK_VIDEOS, script, ai_model)
+
+        if not search_terms:
+            raise Exception("Failed to generate search terms")
 
         # Search for a video of the given search term
         video_urls = []
@@ -398,22 +442,15 @@ def generate():
             "generation_id": generation_id
         })
     except Exception as err:
-        # Clean up temp files even if there's an error
-        try:
-            shutil.rmtree(temp_dir)
-            shutil.rmtree(subtitles_dir)
-        except:
-            pass
-            
-        print(colored(f"[-] Error: {str(err)}", "red"))
-        update_progress(generation_id, "error", 0, str(err))
-        return jsonify(
-            {
-                "status": "error",
-                "message": f"Could not generate video: {str(err)}",
-                "data": [],
-            }
-        )
+        GENERATING = False
+        error_message = str(err)
+        print(colored(f"[-] Error: {error_message}", "red"))
+        update_progress(generation_id, "error", 0, error_message)
+        return jsonify({
+            "status": "error",
+            "message": f"Could not generate video: {error_message}",
+            "data": [],
+        })
 
 
 @app.route("/api/cancel", methods=["POST"])
@@ -429,9 +466,53 @@ def cancel():
 @app.route("/api/progress/<generation_id>", methods=["GET"])
 def get_progress(generation_id):
     """Endpoint to get progress of video generation"""
-    if generation_id in GENERATION_PROGRESS:
-        return jsonify(GENERATION_PROGRESS[generation_id])
-    return jsonify({"status": "not_found", "progress": 0, "message": "Generation not found"})
+    return jsonify(get_generation_progress(generation_id))
+
+
+# Add download endpoints
+@app.route("/download/video/<generation_id>")
+def download_video(generation_id):
+    try:
+        video_path = os.path.join("temp", generation_id, "final_video.mp4")
+        if not os.path.exists(video_path):
+            return jsonify({
+                "status": "error",
+                "message": "Video file not found"
+            }), 404
+        return send_file(
+            video_path,
+            mimetype='video/mp4',
+            as_attachment=True,
+            download_name='video.mp4'
+        )
+    except Exception as e:
+        print(colored(f"[-] Error downloading video: {str(e)}", "red"))
+        return jsonify({
+            "status": "error",
+            "message": "Error downloading video"
+        }), 500
+
+@app.route("/download/script/<generation_id>")
+def download_script(generation_id):
+    try:
+        script_path = os.path.join("temp", generation_id, "script.txt")
+        if not os.path.exists(script_path):
+            return jsonify({
+                "status": "error",
+                "message": "Script file not found"
+            }), 404
+        return send_file(
+            script_path,
+            mimetype='text/plain',
+            as_attachment=True,
+            download_name='script.txt'
+        )
+    except Exception as e:
+        print(colored(f"[-] Error downloading script: {str(e)}", "red"))
+        return jsonify({
+            "status": "error",
+            "message": "Error downloading script"
+        }), 500
 
 
 if __name__ == "__main__":
