@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Node
+node_modules/
+.next/
+.env*.local
+
+# Project specific directories
+Backend/temp/
+Backend/final_videos/
+Backend/output/
+Backend/downloads/
+Backend/uploads/
+
+# Media and generated files
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+*.mkv
+*.m4a
+*.aac
+*.ogg
+*.webm
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+.DS_Store
+
+# Keep requirements.txt
+!requirements.txt 
