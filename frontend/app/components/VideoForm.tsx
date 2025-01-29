@@ -40,9 +40,9 @@ export default function VideoForm() {
         useMusic: formData.get('useMusicToggle') === 'on',
         zipUrl: formData.get('zipUrl') as string,
         threads: Number(formData.get('threads')) || 2,
-        subtitlesPosition: formData.get('subtitlesPosition') || 'center,bottom',
+        subtitlesPosition: formData.get('subtitlesPosition') || 'center,center',
         customPrompt: formData.get('customPrompt') as string,
-        color: formData.get('subtitlesColor') || '#FFFFFF',
+        color: formData.get('subtitlesColor') || '#FFFF00',
       };
 
       const response = await fetch(`${API_URL}/api/generate`, {
@@ -69,8 +69,36 @@ export default function VideoForm() {
     }
   };
 
+  const GenerateButton = ({ className = "" }) => (
+    <button
+      type="submit"
+      disabled={isGenerating}
+      className={`bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-full hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium ${className}`}
+    >
+      {isGenerating ? (
+        <span className="flex items-center gap-2">
+          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          Generating...
+        </span>
+      ) : (
+        'Generate Video'
+      )}
+    </button>
+  );
+
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-8">
+      {/* Progress Bar */}
+      {isGenerating && generationId && (
+        <ProgressBar 
+          generationId={generationId} 
+          onError={() => setIsGenerating(false)}
+        />
+      )}
+
       {/* Main Input */}
       <div className="bg-white dark:bg-foreground/5 rounded-lg shadow-sm p-6">
         <label className="block">
@@ -87,7 +115,7 @@ export default function VideoForm() {
         </label>
       </div>
 
-      {/* Controls */}
+      {/* Top Controls */}
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -98,20 +126,18 @@ export default function VideoForm() {
           <span>{showAdvanced ? '▲' : '▼'}</span>
         </button>
 
-        <button
-          type="submit"
-          disabled={isGenerating}
-          className="bg-foreground text-background px-6 py-2 rounded-full hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isGenerating ? 'Generating...' : 'Generate Video'}
-        </button>
+        <GenerateButton />
       </div>
 
       {/* Advanced Options */}
       {showAdvanced && <AdvancedOptions />}
 
-      {/* Progress Bar */}
-      {generationId && <ProgressBar generationId={generationId} />}
+      {/* Bottom Generate Button */}
+      {showAdvanced && (
+        <div className="flex justify-center pt-4">
+          <GenerateButton className="w-full sm:w-auto" />
+        </div>
+      )}
     </form>
   );
 } 

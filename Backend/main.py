@@ -13,6 +13,7 @@ from apiclient.errors import HttpError
 from flask import Flask, request, jsonify, send_file
 import time
 import threading
+from collections import defaultdict
 
 
 
@@ -50,15 +51,21 @@ HOST = "0.0.0.0"
 PORT = 8080
 AMOUNT_OF_STOCK_VIDEOS = 5
 GENERATING = False
-GENERATION_PROGRESS = {}
+GENERATION_PROGRESS = defaultdict(lambda: {
+    "status": "processing",
+    "progress": 0,
+    "message": "Starting video generation..."
+})
 
 
-def update_progress(generation_id: str, status: str, progress: int, message: str):
-    """Update the progress of a video generation"""
+def update_progress(generation_id: str, status: str, progress: int, message: str, metadata_path: str = None, video_path: str = None):
+    """Update the progress of video generation"""
     GENERATION_PROGRESS[generation_id] = {
         "status": status,
         "progress": progress,
-        "message": message
+        "message": message,
+        "metadataPath": metadata_path,
+        "videoPath": video_path
     }
 
     # Save script to file when it's generated
@@ -324,6 +331,8 @@ def generate():
             title, description, keywords = generate_metadata(data["videoSubject"], script, ai_model)
             
             # Save metadata with the same video_id
+            metadata_path = f"../final_videos/{generation_id}.txt"
+            update_progress(generation_id, "processing", 50, "Saving metadata...", metadata_path=metadata_path)
             save_video_metadata(video_id, title, description, keywords)
 
             if use_music:
@@ -356,6 +365,10 @@ def generate():
                     del GENERATION_PROGRESS[generation_id]
             
             threading.Thread(target=cleanup_progress).start()
+
+            # When video is complete
+            video_path = f"../final_videos/{generation_id}.mp4"
+            update_progress(generation_id, "completed", 100, "Video generation complete!", metadata_path=metadata_path, video_path=video_path)
 
             # Return JSON with the path relative to final_videos directory
             return jsonify({
@@ -465,8 +478,16 @@ def cancel():
 
 @app.route("/api/progress/<generation_id>", methods=["GET"])
 def get_progress(generation_id):
-    """Endpoint to get progress of video generation"""
-    return jsonify(get_generation_progress(generation_id))
+    """Get the progress of video generation"""
+    if generation_id in GENERATION_PROGRESS:
+        return jsonify(GENERATION_PROGRESS[generation_id])
+    
+    # Return processing status instead of not_found
+    return jsonify({
+        "status": "processing",
+        "progress": 0,
+        "message": "Starting video generation..."
+    })
 
 
 # Add download endpoints

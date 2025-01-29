@@ -63,12 +63,12 @@ export default function AdvancedOptions() {
           <span className="block text-foreground/90 font-medium mb-2">Subtitles Position</span>
           <select
             name="subtitlesPosition"
-            defaultValue="center,bottom"
+            defaultValue="center,center"
             className="w-full rounded-md border border-foreground/10 bg-background px-4 py-2 text-foreground shadow-sm focus:border-foreground/20 focus:ring-2 focus:ring-foreground/10"
           >
             <option value="center,top">Center - Top</option>
-            <option value="center,bottom">Center - Bottom</option>
             <option value="center,center">Center - Center</option>
+            <option value="center,bottom">Center - Bottom</option>
             <option value="left,center">Left - Center</option>
             <option value="left,bottom">Left - Bottom</option>
             <option value="right,center">Right - Center</option>
@@ -82,8 +82,9 @@ export default function AdvancedOptions() {
           <input
             type="color"
             name="subtitlesColor"
-            defaultValue="#FFFFFF"
+            defaultValue="#FFFF00"
             className="w-full h-10 rounded-md border border-foreground/10 bg-background px-2 text-foreground shadow-sm focus:border-foreground/20 focus:ring-2 focus:ring-foreground/10"
+            onInput={(e) => e.currentTarget.blur()}
           />
         </label>
 
