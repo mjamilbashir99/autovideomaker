@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import AdvancedOptions from './AdvancedOptions';
-import ProgressBar from './ProgressBar';
+import { useState } from "react";
+import AdvancedOptions from "./AdvancedOptions";
+import ProgressBar from "./ProgressBar";
 
 interface FormData {
   videoSubject: string;
@@ -23,7 +23,7 @@ export default function VideoForm() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [generationId, setGenerationId] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,6 +32,7 @@ export default function VideoForm() {
     try {
       const formData = new FormData(e.currentTarget);
       const data = {
+<<<<<<< HEAD
         videoSubject: formData.get('videoSubject') as string,
         aiModel: formData.get('aiModel') || 'g4f',
         voice: formData.get('voice') || 'en_us_001',
@@ -43,19 +44,32 @@ export default function VideoForm() {
         subtitlesPosition: formData.get('subtitlesPosition') || 'center,center',
         customPrompt: formData.get('customPrompt') as string,
         color: formData.get('subtitlesColor') || '#FFFF00',
+=======
+        videoSubject: formData.get("videoSubject") as string,
+        aiModel: formData.get("aiModel") || "g4f",
+        voice: formData.get("voice") || "en_us_001",
+        paragraphNumber: Number(formData.get("paragraphNumber")) || 1,
+        automateYoutubeUpload: formData.get("youtubeUploadToggle") === "on",
+        useMusic: formData.get("useMusicToggle") === "on",
+        zipUrl: formData.get("zipUrl") as string,
+        threads: Number(formData.get("threads")) || 2,
+        subtitlesPosition: formData.get("subtitlesPosition") || "center,bottom",
+        customPrompt: formData.get("customPrompt") as string,
+        color: formData.get("subtitlesColor") || "#FFFFFF",
+>>>>>>> 8e9ea0b (first commit)
       };
 
       const response = await fetch(`${API_URL}/api/generate`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       const result = await response.json();
-      
-      if (result.status === 'error') {
+
+      if (result.status === "error") {
         throw new Error(result.message);
       }
 
@@ -63,9 +77,9 @@ export default function VideoForm() {
         setGenerationId(result.generation_id);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       setIsGenerating(false);
-      alert(error instanceof Error ? error.message : 'An error occurred');
+      alert(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
@@ -100,7 +114,7 @@ export default function VideoForm() {
       )}
 
       {/* Main Input */}
-      <div className="bg-white dark:bg-foreground/5 rounded-lg shadow-sm p-6">
+      <div className="bg-gray-500 dark:bg-foreground/5 rounded-lg shadow-sm p-6">
         <label className="block">
           <span className="block text-foreground/90 font-medium mb-2">
             Video Subject
@@ -122,11 +136,23 @@ export default function VideoForm() {
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="text-foreground/80 hover:text-foreground font-medium flex items-center gap-2"
         >
-          <span>{showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}</span>
-          <span>{showAdvanced ? '▲' : '▼'}</span>
+          <span>
+            {showAdvanced ? "Hide Advanced Options" : "Show Advanced Options"}
+          </span>
+          <span>{showAdvanced ? "▲" : "▼"}</span>
         </button>
 
+<<<<<<< HEAD
         <GenerateButton />
+=======
+        <button
+          type="submit"
+          disabled={isGenerating}
+          className="bg-foreground text-background px-6 py-2 rounded-full hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isGenerating ? "Generating..." : "Generate Video"}
+        </button>
+>>>>>>> 8e9ea0b (first commit)
       </div>
 
       {/* Advanced Options */}
@@ -140,4 +166,4 @@ export default function VideoForm() {
       )}
     </form>
   );
-} 
+}

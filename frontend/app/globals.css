@@ -19,3 +19,35 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* css foe navbar */
+.container {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+}
+
+.animated-gradient-text {
+  /* Adjust size as needed */
+  font-weight: bold;
+  background: linear-gradient(90deg, #8b5cf6, #ffffff, #ec4899);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientAnimation 5s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}

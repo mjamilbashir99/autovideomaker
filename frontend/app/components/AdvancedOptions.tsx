@@ -1,12 +1,14 @@
-'use client';
+"use client";
 
 export default function AdvancedOptions() {
   return (
-    <div className="bg-white dark:bg-foreground/5 rounded-lg shadow-sm p-6 space-y-6">
+    <div className="bg-gray-500 dark:bg-foreground/5 rounded-lg shadow-sm p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* AI Model */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">AI Model</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            AI Model
+          </span>
           <select
             name="aiModel"
             defaultValue="g4f"
@@ -21,7 +23,9 @@ export default function AdvancedOptions() {
 
         {/* Voice Selection */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Voice</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Voice
+          </span>
           <select
             name="voice"
             defaultValue="en_us_001"
@@ -47,7 +51,9 @@ export default function AdvancedOptions() {
 
         {/* Paragraphs */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Paragraphs</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Paragraphs
+          </span>
           <input
             type="number"
             name="paragraphNumber"
@@ -60,7 +66,9 @@ export default function AdvancedOptions() {
 
         {/* Subtitles Position */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Subtitles Position</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Subtitles Position
+          </span>
           <select
             name="subtitlesPosition"
             defaultValue="center,center"
@@ -78,7 +86,9 @@ export default function AdvancedOptions() {
 
         {/* Subtitles Color */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Subtitles Color</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Subtitles Color
+          </span>
           <input
             type="color"
             name="subtitlesColor"
@@ -90,7 +100,9 @@ export default function AdvancedOptions() {
 
         {/* Processing Threads */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Processing Threads</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Processing Threads
+          </span>
           <input
             type="number"
             name="threads"
@@ -106,7 +118,9 @@ export default function AdvancedOptions() {
       <div className="space-y-4">
         {/* Custom Prompt */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Custom Prompt (Optional)</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Custom Prompt (Optional)
+          </span>
           <textarea
             name="customPrompt"
             rows={3}
@@ -117,7 +131,9 @@ export default function AdvancedOptions() {
 
         {/* Music URL */}
         <label className="block">
-          <span className="block text-foreground/90 font-medium mb-2">Music ZIP URL (Optional)</span>
+          <span className="block text-foreground/90 font-medium mb-2">
+            Music ZIP URL (Optional)
+          </span>
           <input
             type="url"
             name="zipUrl"
@@ -149,4 +165,4 @@ export default function AdvancedOptions() {
       </div>
     </div>
   );
-} 
+}
