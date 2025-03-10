@@ -66,6 +66,7 @@ const handler = NextAuth({
       }
       return token;
     },
+
     async session({ session, token }) {
       if (session?.user) {
         session.user.role = token.role;
