@@ -1,5 +1,5 @@
 import React from "react";
-import VideoForm from "../components/VideoForm";
+import VideoForm from "./VideoForm";
 
 const MainWrapper = () => {
   return (

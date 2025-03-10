@@ -133,7 +133,20 @@ const Page = () => {
           </Form>
         )}
       </Formik>
-
+      <div>
+        {/* Forgot Password Link */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-500">
+            Forgot your password?{" "}
+            <Link
+              href="/reset-password"
+              className="text-blue-600 hover:text-blue-400"
+            >
+              Forgot Password
+            </Link>
+          </p>
+        </div>
+      </div>
       {/* Signup Link */}
       <div className="mt-6 text-center">
         <p className="text-gray-500">

@@ -9,9 +9,14 @@ export default withAuth(
     const isAuthenticated = !!req.nextauth.token;
 
     if (
-      ["/login", "/signup", "/api/auth", "/api/register", "/datadeletion"].some(
-        (prefix) => path.startsWith(prefix)
-      )
+      [
+        "/login",
+        "/signup",
+        "/api/auth",
+        "/api/register",
+        "/datadeletion",
+        "/reset-password",
+      ].some((prefix) => path.startsWith(prefix))
     ) {
       if (isAuthenticated) {
         return NextResponse.redirect(new URL("/", req.url));
